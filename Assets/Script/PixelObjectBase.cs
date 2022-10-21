@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class PixelObjectBase : MonoBehaviour
 {
-    private Vector3 cashPosition;
+    private  Vector3 cashPosition;
 
-    void LateUpdate()
+    private  void LateUpdate()
     {
         cashPosition = transform.localPosition;
         transform.localPosition = new Vector3 (
@@ -16,7 +16,7 @@ public class PixelObjectBase : MonoBehaviour
         );
     }
 
-    void OnRenderObject()
+    private void OnRenderObject()
     {
         transform.localPosition = cashPosition;
     }
