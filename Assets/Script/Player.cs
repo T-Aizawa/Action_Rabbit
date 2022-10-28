@@ -20,6 +20,7 @@ public class Player : MonoBehaviour
     // タッチ入力の受付
     [SerializeField] TouchHandler inputTouch;
 
+    // 移動を制御
     [SerializeField] float jumpLimitMagnitude;
     [SerializeField] float flyLimitMagnitude;
     [SerializeField] float speed;
@@ -36,7 +37,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        Debug.Log(currentState);
         currentState.OnEnter(this, null);
     }
 
@@ -60,6 +60,10 @@ public class Player : MonoBehaviour
         currentState.OnEndDrag(this, data.position);
     }
 
+    /// <summary>
+    /// プレイヤーの状態を移行する
+    /// </summary>
+    /// <param name="nextState">次のプレイヤーの状態</param>
 	void ChangeState(PlayerStateBase nextState)
 	{
 		currentState.OnExit(this, nextState);
@@ -67,11 +71,19 @@ public class Player : MonoBehaviour
 		currentState = nextState;
 	}
 
+    /// <summary>
+    /// プレイヤーを移動する
+    /// </summary>
+    /// <param name="force">プレイヤーに加える力</param>
     void Move(Vector2 force)
     {
         playerRb.AddForce(force * speed, ForceMode2D.Impulse);
     }
 
+    /// <summary>
+    /// 衝突時の動作
+    /// </summary>
+    /// <param name="other">衝突したオブジェクト</param>
     void OnCollisionEnter2D(Collision2D other)
     {
         // 地面に衝突したとき
@@ -93,7 +105,6 @@ public class Player : MonoBehaviour
         public override void OnDrag(Player owner, Vector2 dragPos)
         {
             var diff = dragPos - owner.startPosition;
-
             var magnitude = diff.magnitude > owner.jumpLimitMagnitude ? owner.jumpLimitMagnitude : diff.magnitude;
         }
 
@@ -119,24 +130,18 @@ public class Player : MonoBehaviour
 
         public override void OnBeginDrag(Player owner, Vector2 beginPos)
         {
-            Debug.Log("begin drag jumping");
-            Debug.Log(beginPos);
             owner.startPosition = beginPos;
         }
 
         public override void OnDrag(Player owner, Vector2 dragPos)
         {
             var diff = dragPos - owner.startPosition;
-            Debug.Log(diff);
-
             var magnitude = diff.magnitude > owner.flyLimitMagnitude ? owner.flyLimitMagnitude : diff.magnitude;
-            Debug.Log(magnitude);
         }
 
         public override void OnEndDrag(Player owner, Vector2 endPos)
         {
             var diff = endPos - owner.startPosition;
-            Debug.Log("end drag jumping!!");
             var magnitudeLimitRatio = owner.flyLimitMagnitude / Mathf.Max(diff.magnitude, owner.flyLimitMagnitude);
 
             owner.Move(-diff * magnitudeLimitRatio);
